@@ -7,13 +7,13 @@ from googleapiclient.discovery import build
 class Channel:
     """Класс для ютуб-канала"""
     api_key: str = os.getenv('API_KEY')
-    youtube = build('youtube', 'v3', developerKey=api_key)
+    # youtube = build('youtube', 'v3', developerKey=api_key)
 
 
     def __init__(self, channel_id: str) -> None:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
         self.channel_id = channel_id
-        self.channel = self.youtube.channels().list(id=self.channel_id, part='snippet,statistics').execute()
+        self.channel = self.get_service().channels().list(id=self.channel_id, part='snippet,statistics').execute()
         self.title = self.channel['items'][0]['snippet']['title']
         self.description = self.channel['items'][0]['snippet']['description']
         self.url = ''.join(['https://www.youtube.com/channel/', self.channel_id])
@@ -21,9 +21,32 @@ class Channel:
         self.video_count = self.channel['items'][0]['statistics']['videoCount']
         self.viewCount = self.channel['items'][0]['statistics']['viewCount']
 
+
+    def __str__(self):
+        return str(f'{self.title} ({self.url})')
+
+    def __add__(self, other):
+        return int(self.subscriberCount) + int(other.subscriberCount)
+
+    def __sub__(self, other):
+        return int(self.subscriberCount) - int(other.subscriberCount)
+
+    def __lt__(self, other):
+        return int(other.subscriberCount) < int(self.subscriberCount)
+
+    def __le__(self, other):
+        return int(other.subscriberCount) <= int(self.subscriberCount)
+
+    def __gt__(self, other):
+        return int(other.subscriberCount) > int(self.subscriberCount)
+
+    def __eq__(self, other):
+        return int(other.subscriberCount) == int(self.subscriberCount)
+
     @classmethod
     def get_service(cls):
-        return Channel.youtube
+        youtube = build('youtube', 'v3', developerKey=Channel.api_key)
+        return youtube
 
     def to_json(self, filename):
         with open(file=filename, mode='w', encoding='utf-8') as f:
