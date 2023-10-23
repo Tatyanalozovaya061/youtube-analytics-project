@@ -10,15 +10,15 @@ class Video:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
         self.video_id = video_id
         youtube = build('youtube', 'v3', developerKey=Video.api_key)
-        # video_id = 'gaoc9MPZ4bw'
         video_response = youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
                                                id=video_id
                                                ).execute()
-        # print(json.dumps(video_response, indent=2, ensure_ascii=False))
+        print(json.dumps(video_response, indent=2, ensure_ascii=False))
         self.title = video_response['items'][0]['snippet']['title']
         self.url = f'https://www.youtube.com/watch?v={video_id}'
         self.view_count = video_response['items'][0]['statistics']['viewCount']
         self.like_count = video_response['items'][0]['statistics']['likeCount']
+
 
     def __str__(self):
         return f'{self.title}'
