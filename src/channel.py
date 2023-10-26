@@ -1,14 +1,11 @@
 import json
 import os
 
-from googleapiclient.discovery import build
+from src.apimixin import APIMixin
 
 
-class Channel:
+class Channel(APIMixin):
     """Класс для ютуб-канала"""
-    api_key: str = os.getenv('API_KEY')
-    # youtube = build('youtube', 'v3', developerKey=api_key)
-
 
     def __init__(self, channel_id: str) -> None:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
@@ -23,6 +20,7 @@ class Channel:
 
 
     def __str__(self):
+        """Возвращает название и ссылку канала"""
         return str(f'{self.title} ({self.url})')
 
     def __add__(self, other):
@@ -42,11 +40,6 @@ class Channel:
 
     def __eq__(self, other):
         return int(other.subscriberCount) == int(self.subscriberCount)
-
-    @classmethod
-    def get_service(cls):
-        youtube = build('youtube', 'v3', developerKey=Channel.api_key)
-        return youtube
 
     def to_json(self, filename):
         with open(file=filename, mode='w', encoding='utf-8') as f:
