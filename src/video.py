@@ -1,7 +1,6 @@
 import os
 import json
 
-from googleapiclient.discovery import build
 from src.apimixin import APIMixin
 
 
@@ -12,16 +11,20 @@ class Video(APIMixin):
     def __init__(self, video_id):
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
         self.video_id = video_id
-        youtube = self.get_service()
-        # youtube = build('youtube', 'v3', developerKey=Video.api_key)
-        video_response = youtube.videos().list(part='snippet,statistics,contentDetails,topicDetails',
+        video_response = self.get_service().videos().list(part='snippet,statistics,contentDetails,topicDetails',
                                                id=video_id
                                                ).execute()
-        print(json.dumps(video_response, indent=2, ensure_ascii=False))
-        self.title = video_response['items'][0]['snippet']['title']
-        self.url = f'https://www.youtube.com/watch?v={video_id}'
-        self.view_count = video_response['items'][0]['statistics']['viewCount']
-        self.like_count = video_response['items'][0]['statistics']['likeCount']
+        # print(json.dumps(video_response, indent=2, ensure_ascii=False))
+        try:
+            self.title = video_response['items'][0]['snippet']['title']
+            self.url = f'https://www.youtube.com/watch?v={video_id}'
+            self.view_count = video_response['items'][0]['statistics']['viewCount']
+            self.like_count = video_response['items'][0]['statistics']['likeCount']
+        except IndexError:
+            self.title = None
+            self.url = None
+            self.view_count = None
+            self.like_count = None
 
 
     def __str__(self):
